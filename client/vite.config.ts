@@ -6,8 +6,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/fhir': 'http://localhost:8080',
-      '/auth': 'http://localhost:8080',
+      '/fhir': 'http://localhost:8099',
+      '/auth': 'http://localhost:8099',
     },
   },
 });
