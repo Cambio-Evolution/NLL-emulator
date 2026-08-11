@@ -7,6 +7,7 @@ import {
   PROFILES,
   SYSTEMS,
 } from './fhir/types';
+import { seedBulk } from './seed-bulk';
 
 /**
  * All identities below are SYNTHETIC. Personnummer are generated with a valid
@@ -250,11 +251,7 @@ export async function seed(): Promise<void> {
   await migrate();
 
   const { rows } = await pool.query('SELECT count(*)::int AS n FROM patients');
-  if (rows[0].n > 0) {
-    console.log('Database already seeded, skipping.');
-    return;
-  }
-
+  if (rows[0].n === 0) {
   for (const sp of seedPatients) {
     const patientId = randomUUID();
     const patient: Patient = {
@@ -373,7 +370,13 @@ export async function seed(): Promise<void> {
     }
     console.log(`Seeded ${sp.given.join(' ')} ${sp.family} (${sp.pnr})`);
   }
-  console.log('Seed complete.');
+  console.log('Seed complete (named patients).');
+  } else {
+    console.log('Named patients already present, skipping.');
+  }
+
+  // Add 1 000 bulk synthetic patients if not yet done
+  await seedBulk(1005);
 }
 
 if (require.main === module) {
