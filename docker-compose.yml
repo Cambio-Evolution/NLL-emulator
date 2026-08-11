@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nll
+      POSTGRES_PASSWORD: nll_local_dev
+      POSTGRES_DB: nll_mock
+    ports:
+      - "5432:5432"
+    volumes:
+      - nll_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nll -d nll_mock"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  server:
+    build: ./server
+    environment:
+      PORT: 8080
+      DATABASE_URL: postgres://nll:nll_local_dev@db:5432/nll_mock
+      MOCK_CLIENT_ID: nll-mock-client
+      MOCK_CLIENT_SECRET: nll-mock-secret
+      SEED_ON_START: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  client:
+    build: ./client
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+
+volumes:
+  nll_pgdata:

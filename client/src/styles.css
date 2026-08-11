@@ -1,0 +1,480 @@
+/* ------------------------------------------------------------------
+   NLL Mock — "registerutdrag" look.
+   Palette: petrol (myndighet), clinical cool paper, ink,
+   ochre stamp for the testdata mark, semantic status colors.
+------------------------------------------------------------------- */
+:root {
+  --petrol: #0e4d45;
+  --petrol-deep: #093630;
+  --paper: #f2f5f4;
+  --card: #ffffff;
+  --ink: #17211f;
+  --muted: #5c6b68;
+  --line: #d4dedb;
+  --stamp: #b0761a;
+  --ok: #1f7a4d;
+  --warn: #9a6a00;
+  --stop: #b3402f;
+  --hold: #4a5d9e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.92em;
+  letter-spacing: 0.02em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Archivo', system-ui, sans-serif;
+  margin: 0;
+}
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Masthead ---------------------------------------------------------- */
+.masthead {
+  background: var(--petrol);
+  color: #eef4f2;
+  padding: 28px 32px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 4px solid var(--petrol-deep);
+}
+
+.masthead__reg {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: #9dc3ba;
+}
+
+.masthead h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+}
+
+.masthead__sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #b9d2cc;
+}
+
+/* The signature element: a rubber-stamp testdata mark */
+.stamp {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.28em;
+  color: #f0c56b;
+  border: 2px solid #f0c56b;
+  border-radius: 3px;
+  padding: 7px 14px 6px 17px;
+  transform: rotate(-4deg);
+  opacity: 0.92;
+  user-select: none;
+}
+
+/* Layout ------------------------------------------------------------ */
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 0;
+  flex: 1;
+}
+
+.sidebar {
+  background: var(--card);
+  border-right: 1px solid var(--line);
+  padding: 24px 20px;
+}
+
+.sidebar__heading {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 28px 0 10px;
+}
+
+.search label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.search__row {
+  display: flex;
+  gap: 8px;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: var(--paper);
+}
+
+.search input:focus-visible,
+.btn:focus-visible,
+select:focus-visible,
+.patient:focus-visible {
+  outline: 2px solid var(--petrol);
+  outline-offset: 2px;
+}
+
+.patients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.patient {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 9px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font: inherit;
+  color: inherit;
+}
+
+.patient:hover {
+  background: var(--paper);
+}
+
+.patient--active {
+  background: #e5efec;
+  border-color: var(--petrol);
+}
+
+.patient__name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.patient__pnr {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* Main content ------------------------------------------------------ */
+.content {
+  padding: 28px 32px 64px;
+  max-width: 980px;
+}
+
+.content__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--petrol);
+}
+
+.content__head h2 {
+  font-size: 22px;
+}
+
+.content__tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+select {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 10px;
+  background: var(--card);
+  font: inherit;
+  font-size: 14px;
+}
+
+/* Buttons ------------------------------------------------------------ */
+.btn {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn--primary {
+  background: var(--petrol);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--petrol-deep);
+}
+
+.btn--ghost {
+  background: none;
+  border-color: var(--line);
+  color: var(--petrol);
+}
+
+.btn--ghost:hover {
+  border-color: var(--petrol);
+}
+
+.btn--link {
+  background: none;
+  border: none;
+  color: var(--petrol);
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* Prescription cards -------------------------------------------------- */
+.rx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rx {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--petrol);
+  border-radius: 6px;
+  padding: 18px 20px 14px;
+}
+
+.rx__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.rx__name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.rx__meta {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.rx__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px 20px;
+  margin: 16px 0 6px;
+  padding: 12px 0;
+  border-top: 1px dashed var(--line);
+  border-bottom: 1px dashed var(--line);
+}
+
+.rx__facts dt {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.rx__facts dd {
+  margin: 2px 0 0;
+  font-size: 14.5px;
+}
+
+.rx__foot {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+/* Dispenses ------------------------------------------------------------ */
+.dispenses {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dispense {
+  display: grid;
+  grid-template-columns: 110px 1fr auto auto;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 14px;
+  padding: 6px 8px;
+  background: var(--paper);
+  border-radius: 4px;
+}
+
+/* Status pills --------------------------------------------------------- */
+.pill {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pill--active {
+  background: #e2f2e9;
+  color: var(--ok);
+}
+
+.pill--completed {
+  background: #eef0f6;
+  color: var(--hold);
+}
+
+.pill--stopped {
+  background: #f6efdd;
+  color: var(--warn);
+}
+
+.pill--cancelled {
+  background: #f8e6e2;
+  color: var(--stop);
+}
+
+/* Drawer (raw FHIR inspector) ------------------------------------------ */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(560px, 100vw);
+  background: #102420;
+  color: #d7e6e1;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.drawer__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #24443c;
+}
+
+.drawer__title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: #8fc4b6;
+}
+
+.drawer__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.drawer .btn--ghost {
+  color: #8fc4b6;
+  border-color: #2c554b;
+}
+
+.drawer__json {
+  margin: 0;
+  padding: 18px;
+  overflow: auto;
+  flex: 1;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* States ---------------------------------------------------------------- */
+.error {
+  background: #f8e6e2;
+  color: var(--stop);
+  border: 1px solid #e4b3a9;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 14.5px;
+}
+
+.empty {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--muted);
+  max-width: 560px;
+}
+
+/* Responsive ------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .content {
+    padding: 20px 16px 48px;
+  }
+
+  .dispense {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
