@@ -4,6 +4,7 @@ import { migrate } from './db';
 import { nllHeaders, requireBearer, tokenRouter } from './middleware/auth';
 import { fhirRouter } from './routes/fhir';
 import { seed } from './seed';
+import { startDailyGrowth } from './scheduler';
 
 const PORT = Number(process.env.PORT || 8080);
 
@@ -12,6 +13,7 @@ async function main(): Promise<void> {
   if (process.env.SEED_ON_START === 'true') {
     await seed();
   }
+  startDailyGrowth();
 
   const app = express();
   app.use(cors());
