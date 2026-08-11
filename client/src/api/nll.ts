@@ -11,13 +11,17 @@ export interface FhirBundle {
   entry?: Array<{ fullUrl?: string; resource?: any }>;
 }
 
+// In local dev (Vite proxy) this is empty; on Render set VITE_API_BASE to
+// the full server URL, e.g. https://nll-mock-server.onrender.com
+const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '';
+
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
 async function getToken(): Promise<string> {
   if (cachedToken && Date.now() < cachedToken.expiresAt - 30_000) {
     return cachedToken.value;
   }
-  const res = await fetch('/auth/token', {
+  const res = await fetch(`${API_BASE}/auth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -37,7 +41,7 @@ async function getToken(): Promise<string> {
 
 export async function fhir<T = any>(path: string): Promise<T> {
   const token = await getToken();
-  const res = await fetch(`/fhir${path}`, {
+  const res = await fetch(`${API_BASE}/fhir${path}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/fhir+json',
