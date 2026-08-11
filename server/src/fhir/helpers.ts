@@ -39,7 +39,11 @@ export const AFF = {
 export function searchBundle(
   resources: Resource[],
   baseUrl: string,
-  selfUrl: string
+  selfUrl: string,
+  opts?: {
+    total?: number;
+    links?: Array<{ relation: string; url: string }>;
+  }
 ): Bundle {
   const entry: BundleEntry[] = resources.map((r) => ({
     fullUrl: `${baseUrl}/${r.resourceType}/${r.id}`,
@@ -49,8 +53,8 @@ export function searchBundle(
   return {
     resourceType: 'Bundle',
     type: 'searchset',
-    total: resources.length,
-    link: [{ relation: 'self', url: selfUrl }],
+    total: opts?.total ?? resources.length,
+    link: opts?.links ?? [{ relation: 'self', url: selfUrl }],
     entry,
   };
 }

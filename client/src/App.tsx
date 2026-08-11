@@ -153,6 +153,13 @@ function PrescriptionCard({
 
 export default function App() {
   const [patients, setPatients] = useState<AnyResource[]>([]);
+  const [patientTotal, setPatientTotal] = useState(0);
+  const [patientOffset, setPatientOffset] = useState(0);
+  const [patientNameInput, setPatientNameInput] = useState('');
+  const [patientNameFilter, setPatientNameFilter] = useState('');
+  const [patientLoading, setPatientLoading] = useState(false);
+  const PAGE_SIZE = 20;
+
   const [selected, setSelected] = useState<AnyResource | null>(null);
   const [rxBundle, setRxBundle] = useState<FhirBundle | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -161,12 +168,32 @@ export default function App() {
   const [inspect, setInspect] = useState<AnyResource | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Debounce name filter — reset to page 1 when filter changes
   useEffect(() => {
+    const t = setTimeout(() => {
+      setPatientOffset(0);
+      setPatientNameFilter(patientNameInput);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [patientNameInput]);
+
+  // Fetch patient page whenever offset or name filter changes
+  useEffect(() => {
+    setPatientLoading(true);
     api
-      .listPatients()
-      .then((b) => setPatients(entries(b)))
-      .catch((e) => setError(e.message));
-  }, []);
+      .listPatients({
+        offset: patientOffset,
+        count: PAGE_SIZE,
+        name: patientNameFilter || undefined,
+      })
+      .then((b) => {
+        setPatients(entries(b));
+        setPatientTotal(b.total ?? 0);
+        setError(null);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setPatientLoading(false));
+  }, [patientOffset, patientNameFilter]);
 
   useEffect(() => {
     if (!selected) return;
@@ -245,6 +272,22 @@ export default function App() {
           </form>
 
           <h2 className="sidebar__heading">Testpersoner</h2>
+
+          <div className="patient-filter">
+            <input
+              placeholder="Filtrera på namn…"
+              value={patientNameInput}
+              onChange={(e) => setPatientNameInput(e.target.value)}
+              aria-label="Filtrera patientlista på namn"
+            />
+          </div>
+
+          {patientLoading && (
+            <p className="muted" style={{ fontSize: '13px', padding: '6px 0' }}>
+              Hämtar…
+            </p>
+          )}
+
           <ul className="patients">
             {patients.map((p) => {
               const pnr = p.identifier?.[0]?.value ?? '';
@@ -260,7 +303,38 @@ export default function App() {
                 </li>
               );
             })}
+            {!patientLoading && patients.length === 0 && (
+              <li className="muted" style={{ fontSize: '13px', padding: '6px 0' }}>
+                Inga patienter matchar.
+              </li>
+            )}
           </ul>
+
+          <div className="pagination">
+            <span className="pagination__info">
+              {patientTotal === 0
+                ? 'Inga träffar'
+                : `${patientOffset + 1}–${Math.min(patientOffset + PAGE_SIZE, patientTotal)} av ${patientTotal}`}
+            </span>
+            <div className="pagination__controls">
+              <button
+                className="btn btn--ghost btn--sm"
+                disabled={patientOffset === 0}
+                onClick={() => setPatientOffset(Math.max(0, patientOffset - PAGE_SIZE))}
+                aria-label="Föregående sida"
+              >
+                ←
+              </button>
+              <button
+                className="btn btn--ghost btn--sm"
+                disabled={patientOffset + PAGE_SIZE >= patientTotal}
+                onClick={() => setPatientOffset(patientOffset + PAGE_SIZE)}
+                aria-label="Nästa sida"
+              >
+                →
+              </button>
+            </div>
+          </div>
         </aside>
 
         <main className="content">

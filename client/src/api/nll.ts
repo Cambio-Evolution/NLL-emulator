@@ -59,7 +59,13 @@ export async function fhir<T = any>(path: string): Promise<T> {
 }
 
 export const api = {
-  listPatients: () => fhir<FhirBundle>('/Patient'),
+  listPatients: (params?: { offset?: number; count?: number; name?: string }) => {
+    const qs = new URLSearchParams();
+    qs.set('_count', String(params?.count ?? 20));
+    qs.set('_offset', String(params?.offset ?? 0));
+    if (params?.name) qs.set('name', params.name);
+    return fhir<FhirBundle>(`/Patient?${qs}`);
+  },
   findPatientByPnr: (pnr: string) =>
     fhir<FhirBundle>(`/Patient?identifier=${encodeURIComponent(pnr)}`),
   medicationRequests: (patientId: string, status?: string) =>
