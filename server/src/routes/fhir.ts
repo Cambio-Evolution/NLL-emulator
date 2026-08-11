@@ -88,19 +88,32 @@ fhirRouter.get(/^\/\$ping$/, (_req: Request, res: Response) => {
 /* ------------------------------------------------------------------ */
 
 // Search: GET /fhir/Patient?identifier=<system>|<pnr>  or  ?identifier=<pnr>
-//         GET /fhir/Patient?_count=20&_offset=0&name=anna  (paginated list)
+//         GET /fhir/Patient?_count=20&_offset=0&name=anna&_sort=-birthdate
 fhirRouter.get('/Patient', async (req: Request, res: Response) => {
   const identifier = String(req.query.identifier ?? '');
   if (!identifier) {
     const count = Math.min(Math.max(1, Number(req.query._count ?? 20)), 100);
     const offset = Math.max(0, Number(req.query._offset ?? 0));
     const name = String(req.query.name ?? '').trim();
+    const sort = String(req.query._sort ?? '');
+
+    // Map _sort values to safe SQL ORDER BY clauses (allowlist — no raw interpolation)
+    const orderBy = (() => {
+      switch (sort) {
+        case 'name':       return "resource->'name'->0->>'text' ASC";
+        case '-name':      return "resource->'name'->0->>'text' DESC";
+        case '-birthdate':
+        case '-age':       return 'personnummer DESC';
+        default:           return 'personnummer ASC'; // covers 'birthdate', 'age', ''
+      }
+    })();
 
     const buildPageUrl = (o: number): string => {
       const u = new URL(`${req.protocol}://${req.get('host')}/fhir/Patient`);
       u.searchParams.set('_count', String(count));
       u.searchParams.set('_offset', String(o));
       if (name) u.searchParams.set('name', name);
+      if (sort) u.searchParams.set('_sort', sort);
       return u.toString();
     };
 
@@ -115,13 +128,13 @@ fhirRouter.get('/Patient', async (req: Request, res: Response) => {
       );
       dataResult = await pool.query(
         `SELECT resource FROM patients WHERE resource->'name'->0->>'text' ILIKE $1
-         ORDER BY personnummer LIMIT $2 OFFSET $3`,
+         ORDER BY ${orderBy} LIMIT $2 OFFSET $3`,
         [pattern, count, offset],
       );
     } else {
       totalResult = await pool.query('SELECT count(*)::int AS n FROM patients');
       dataResult = await pool.query(
-        'SELECT resource FROM patients ORDER BY personnummer LIMIT $1 OFFSET $2',
+        `SELECT resource FROM patients ORDER BY ${orderBy} LIMIT $1 OFFSET $2`,
         [count, offset],
       );
     }

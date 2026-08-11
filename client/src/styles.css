@@ -198,9 +198,13 @@ select:focus-visible,
 /* Patient name filter -------------------------------------------------- */
 .patient-filter {
   margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.patient-filter input {
+.patient-filter input,
+.patient-sort {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 4px;
@@ -210,7 +214,8 @@ select:focus-visible,
   background: var(--paper);
 }
 
-.patient-filter input:focus-visible {
+.patient-filter input:focus-visible,
+.patient-sort:focus-visible {
   outline: 2px solid var(--petrol);
   outline-offset: 2px;
 }

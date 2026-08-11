@@ -157,6 +157,7 @@ export default function App() {
   const [patientOffset, setPatientOffset] = useState(0);
   const [patientNameInput, setPatientNameInput] = useState('');
   const [patientNameFilter, setPatientNameFilter] = useState('');
+  const [patientSort, setPatientSort] = useState('');
   const [patientLoading, setPatientLoading] = useState(false);
   const PAGE_SIZE = 20;
 
@@ -177,7 +178,12 @@ export default function App() {
     return () => clearTimeout(t);
   }, [patientNameInput]);
 
-  // Fetch patient page whenever offset or name filter changes
+  // Reset to page 1 when sort changes
+  useEffect(() => {
+    setPatientOffset(0);
+  }, [patientSort]);
+
+  // Fetch patient page whenever offset, name filter, or sort changes
   useEffect(() => {
     setPatientLoading(true);
     api
@@ -185,6 +191,7 @@ export default function App() {
         offset: patientOffset,
         count: PAGE_SIZE,
         name: patientNameFilter || undefined,
+        sort: patientSort || undefined,
       })
       .then((b) => {
         setPatients(entries(b));
@@ -280,6 +287,18 @@ export default function App() {
               onChange={(e) => setPatientNameInput(e.target.value)}
               aria-label="Filtrera patientlista på namn"
             />
+            <select
+              value={patientSort}
+              onChange={(e) => setPatientSort(e.target.value)}
+              aria-label="Sortera patientlista"
+              className="patient-sort"
+            >
+              <option value="">Sortera: standard</option>
+              <option value="name">Namn A–Ö</option>
+              <option value="-name">Namn Ö–A</option>
+              <option value="birthdate">Ålder: äldst först</option>
+              <option value="-birthdate">Ålder: yngst först</option>
+            </select>
           </div>
 
           {patientLoading && (
