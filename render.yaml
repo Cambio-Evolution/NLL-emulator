@@ -1,0 +1,56 @@
+# Exported from Render on 2026-08-13T14:58:42Z
+version: "1"
+projects:
+- name: NLL-emulator
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: NLL-emulator
+      runtime: node
+      repo: https://github.com/Cambio-Evolution/NLL-emulator
+      plan: starter
+      envVars:
+      - key: BASE_PATIENT_COUNT
+        sync: false
+      - key: GROWTH_START_DATE
+        sync: false
+      - key: DAILY_GROWTH
+        sync: false
+      - key: SEED_ON_START
+        sync: false
+      - key: MOCK_CLIENT_ID
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: NLL-DB-mock
+          property: connectionString
+      - key: MOCK_CLIENT_SECRET
+        sync: false
+      region: frankfurt
+      buildCommand: npm install && npm run build
+      startCommand: npm start
+      autoDeployTrigger: commit
+      rootDir: server
+    - type: web
+      name: NLL-emulator-webpage
+      runtime: static
+      repo: https://github.com/Cambio-Evolution/NLL-emulator
+      envVars:
+      - key: VITE_API_BASE
+        sync: false
+      buildCommand: npm run build
+      staticPublishPath: dist
+      autoDeployTrigger: commit
+      rootDir: client
+    databases:
+    - name: NLL-DB-mock
+      databaseName: nll_db_mock
+      user: nll_db_mock_user
+      plan: basic-256mb
+      region: frankfurt
+      ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+      postgresMajorVersion: "18"
+      diskSizeGB: 15
