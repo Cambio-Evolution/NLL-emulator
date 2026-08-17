@@ -17,6 +17,24 @@ const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '';
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
+async function readJsonResponse(res: Response): Promise<any> {
+  const text = await res.text();
+  if (!text.trim()) {
+    throw new Error(
+      `Empty response body (${res.status} ${res.statusText}) from ${res.url}`
+    );
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    const preview = text.slice(0, 200).replace(/\s+/g, ' ').trim();
+    throw new Error(
+      `Expected JSON but got non-JSON response (${res.status} ${res.statusText}) from ${res.url}${preview ? `: ${preview}` : ''}`
+    );
+  }
+}
+
 async function getToken(): Promise<string> {
   if (cachedToken && Date.now() < cachedToken.expiresAt - 30_000) {
     return cachedToken.value;
@@ -30,8 +48,12 @@ async function getToken(): Promise<string> {
       client_secret: 'nll-mock-secret',
     }),
   });
-  if (!res.ok) throw new Error(`Token request failed (${res.status})`);
-  const data = await res.json();
+  const data = await readJsonResponse(res);
+  if (!res.ok) {
+    const detail =
+      data?.error_description || data?.error || `Token request failed (${res.status})`;
+    throw new Error(detail);
+  }
   cachedToken = {
     value: data.access_token,
     expiresAt: Date.now() + data.expires_in * 1000,
@@ -49,7 +71,7 @@ export async function fhir<T = any>(path: string): Promise<T> {
       'x-system-id': 'nll-mock-client-ui',
     },
   });
-  const body = await res.json();
+  const body = await readJsonResponse(res);
   if (!res.ok) {
     const diag =
       body?.issue?.[0]?.diagnostics || `FHIR request failed (${res.status})`;
