@@ -14,6 +14,12 @@ export interface FhirBundle {
 // In local dev (Vite proxy) this is empty; on Render set VITE_API_BASE to
 // the full server URL, e.g. https://nll-mock-server.onrender.com
 const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '';
+const CLIENT_ID =
+  (import.meta.env.VITE_MOCK_CLIENT_ID as string | undefined) ??
+  'nll-mock-client';
+const CLIENT_SECRET =
+  (import.meta.env.VITE_MOCK_CLIENT_SECRET as string | undefined) ??
+  'nll-mock-secret';
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
@@ -44,8 +50,8 @@ async function getToken(): Promise<string> {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
-      client_id: 'nll-mock-client',
-      client_secret: 'nll-mock-secret',
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
     }),
   });
   const data = await readJsonResponse(res);
